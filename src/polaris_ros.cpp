@@ -92,6 +92,13 @@ int main(int argc, char **argv)
 
     std_msgs::Float32 dt;
     std::map<int,TransformationDataTX> targets;
+
+    std::map<int, strayDataTX> stray_targets;
+    std::string status_str;
+    polaris.readStrayData(status_str, stray_targets);
+
+    polaris.annoy(5);
+
     while (ros::ok())
     {
         /* Start TX */
@@ -99,6 +106,8 @@ int main(int argc, char **argv)
 
 
 	ros::Time start = ros::Time::now();
+
+    polaris.readStrayData(status_str, stray_targets);
 
 	polaris.readDataTX(status,targets);
 

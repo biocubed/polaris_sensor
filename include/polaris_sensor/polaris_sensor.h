@@ -51,6 +51,15 @@ public:
     std::string number;
 };
 
+class strayDataTX
+{
+public:
+    float tx,ty,tz;
+    std::string status;
+    std::string number;
+};
+
+
 /**
  * @brief The QPolaris class is a wrapper used to communicate with a Polaris camera.
  */
@@ -200,6 +209,12 @@ public:
      */
     static void removeChar(std::string& str,const char c);
     const unsigned int getNumberOfTargets()const{return number_of_targets_;}
+
+
+    void readStrayData(std::string &systemStatus, std::map<int, strayDataTX> &map);
+
+    void annoy(int annoy_count);
+
 private:
     unsigned int number_of_targets_;
     serial::Serial m_port;

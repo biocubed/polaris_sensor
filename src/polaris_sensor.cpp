@@ -413,6 +413,66 @@ void Polaris::stopTracking()
     if(int a = checkAnswer(answer_tstop) > 0)
         std::cerr << "TSTOP Error : " << a << std::endl;
 }
+
+
+void Polaris::readStrayData(std::string &systemStatus, std::map<int, strayDataTX> &map)
+{
+    std::string command_tx = "TX 1000\r";
+    m_port.write(command_tx);
+    std::string answer_tx = readUntilCR();
+    std::cout << "big answer : "<<answer_tx<<std::endl;
+    if(int a = checkAnswer(answer_tx) > 0)
+        std::cerr << "TX Error : " << a << std::endl;
+
+    std::string nhandlesBA = answer_tx.substr(0,2);
+    int nhandles = ascii2int(nhandlesBA[0])*16 + ascii2int(nhandlesBA[1]);
+    std::cout << "Nhandles : "<<nhandles<<std::endl;
+    int index = 2;
+
+    if (answer_tx.size() < 20) return;
+
+    for(int i = 0; i < nhandles; i++)
+    {
+        
+        bool missing = false;
+        strayDataTX td = {0};
+        int handle = atoi( answer_tx.substr(index,2).c_str() );
+        std::cout << "handle : "<<answer_tx.substr(index,2)<<std::endl;
+        index += 5;
+        //std::cout  << "substr "<< answer_tx.substr(index,7)<<std::endl;
+        std::string x0 = answer_tx.substr(index,7);
+        std::cout << "x string: " << x0 << std::endl;
+        td.tx = PortHandle2int(x0,10)/100000.0;
+        index+= 7;
+
+        std::string y0 = answer_tx.substr(index,7);
+        std::cout << "y string: " << y0 << std::endl;
+        td.ty = PortHandle2int(y0,10)/100000.0;
+        index+= 7;
+
+        std::string z0 = answer_tx.substr(index,7);
+        std::cout << "z string: " << z0 << std::endl;
+        td.tz = PortHandle2int(z0,10)/100000.0;
+        index+= 7;
+
+        std::string status = answer_tx.substr(index,8);
+        td.status = status;
+        index += 8;
+        printf("<%f, %f, %f>\n", td.tx, td.ty, td.tz);
+    }
+}
+
+void Polaris::annoy(int annoy_count)
+{
+  std::string command_tx = "BEEP 4\r";
+  m_port.write(command_tx);
+  std::string answer_tx = readUntilCR();
+  if(int a = checkAnswer(answer_tx) > 0)
+    std::cerr << "TX Error : " << a << std::endl;
+
+  return;
+}
+
 void Polaris::readDataTX(std::string &systemStatus, std::map<int, TransformationDataTX> &map)
 {
     if(map.size() != getNumberOfTargets())
@@ -424,7 +484,7 @@ void Polaris::readDataTX(std::string &systemStatus, std::map<int, Transformation
     m_port.write(command_tx);
 
     std::string answer_tx = readUntilCR();
-    //std::cout << "big answer : "<<answer_tx<<std::endl;
+    std::cout << "big answer : "<<answer_tx<<std::endl;
     if(int a = checkAnswer(answer_tx) > 0)
         std::cerr << "TX Error : " << a << std::endl;
 

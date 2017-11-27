@@ -31,6 +31,10 @@ add_library(${PROJECT_NAME}
    src/polaris_sensor.cpp
  )
 
+target_link_libraries(${PROJECT_NAME}
+   ${catkin_LIBRARIES} ${Boost_LIBRARIES}
+ )
+
 add_executable(${PROJECT_NAME}_node src/polaris_ros.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node
