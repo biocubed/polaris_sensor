@@ -473,6 +473,12 @@ void Polaris::annoy(int annoy_count)
   return;
 }
 
+void Polaris::flush()
+{
+  std::vector<std::string> result = m_port.readlines(65536,"\r");
+  std::cout << "flushed a total of: " << result.size() << " lines\n";
+}
+
 void Polaris::readDataTX(std::string &systemStatus, std::map<int, TransformationDataTX> &map)
 {
     if(map.size() != getNumberOfTargets())

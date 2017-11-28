@@ -153,6 +153,7 @@ int main(int argc, char **argv)
         ros::spinOnce();
         loop_rate.sleep();
         ++count;
+        polaris.flush();
     }
 
     return 0;

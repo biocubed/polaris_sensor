@@ -215,6 +215,8 @@ public:
 
     void annoy(int annoy_count);
 
+    void flush();
+
 private:
     unsigned int number_of_targets_;
     serial::Serial m_port;
