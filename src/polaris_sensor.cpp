@@ -28,6 +28,15 @@ int Polaris::ascii2int(char c)
     return -1;
 }
 
+void Polaris::setTransformQuery(bool enable)
+{
+  query_transform_data_ = enable;
+}
+
+void Polaris::setStrayQuery(bool enable)
+{
+  query_stray_markers_ = enable;
+}
 
 int Polaris::checkAnswer(const std::string& answer)
 {
@@ -414,6 +423,16 @@ void Polaris::stopTracking()
         std::cerr << "TSTOP Error : " << a << std::endl;
 }
 
+void Polaris::annoy(int annoy_count)
+{
+  std::string command_tx = "BEEP 4\r";
+  m_port.write(command_tx);
+  std::string answer_tx = readUntilCR();
+  if(int a = checkAnswer(answer_tx) > 0)
+    std::cerr << "TX Error : " << a << std::endl;
+
+  return;
+}
 
 void Polaris::readStrayData(std::string &systemStatus, std::map<int, strayDataTX> &map)
 {
@@ -421,8 +440,8 @@ void Polaris::readStrayData(std::string &systemStatus, std::map<int, strayDataTX
     m_port.write(command_tx);
     std::string answer_tx = readUntilCR();
     std::cout << "big answer : "<<answer_tx<<std::endl;
-    if(int a = checkAnswer(answer_tx) > 0)
-        std::cerr << "TX Error : " << a << std::endl;
+    if (int a = checkAnswer(answer_tx) > 0)
+      std::cerr << "TX Error : " << a << std::endl;
 
     std::string nhandlesBA = answer_tx.substr(0,2);
     int nhandles = ascii2int(nhandlesBA[0])*16 + ascii2int(nhandlesBA[1]);
@@ -462,23 +481,6 @@ void Polaris::readStrayData(std::string &systemStatus, std::map<int, strayDataTX
     }
 }
 
-void Polaris::annoy(int annoy_count)
-{
-  std::string command_tx = "BEEP 4\r";
-  m_port.write(command_tx);
-  std::string answer_tx = readUntilCR();
-  if(int a = checkAnswer(answer_tx) > 0)
-    std::cerr << "TX Error : " << a << std::endl;
-
-  return;
-}
-
-void Polaris::flush()
-{
-  std::vector<std::string> result = m_port.readlines(65536,"\r");
-  std::cout << "flushed a total of: " << result.size() << " lines\n";
-}
-
 void Polaris::readDataTX(std::string &systemStatus, std::map<int, TransformationDataTX> &map)
 {
     if(map.size() != getNumberOfTargets())
@@ -486,7 +488,17 @@ void Polaris::readDataTX(std::string &systemStatus, std::map<int, Transformation
       map.clear();
     }
 
-    std::string command_tx = "TX 0001\r";
+    int t_command(0);
+    t_command += (query_transform_data_) ? transform_query : 0;
+    t_command += (query_stray_markers_) ? stray_query : 0;
+
+    char buffer [5];
+    snprintf(buffer, 5, "%d.4", t_command);
+
+    std::string command_tx = "TX ";
+    command_tx += buffer;
+    command_tx += '\r';
+    std::cout << "Data Query: "<< command_tx.c_str(); 
     m_port.write(command_tx);
 
     std::string answer_tx = readUntilCR();
@@ -560,6 +572,12 @@ void Polaris::readDataTX(std::string &systemStatus, std::map<int, Transformation
     systemStatus.clear();
     systemStatus = answer_tx.substr(index,4);
     return;// map;
+}
+
+void Polaris::flush()
+{
+  std::vector<std::string> result = m_port.readlines(65536,"\r");
+  std::cout << "flushed a total of: " << result.size() << " lines\n";
 }
 
 void Polaris::readDataBX(uint16_t& systemStatus, std::map<int, TransformationDataBX>& map)

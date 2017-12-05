@@ -217,7 +217,23 @@ public:
 
     void flush();
 
+    /**
+     * @breif enables/disables getting the transform data.
+     * @param enable The new enable status of the query.
+     */
+    void setTransformQuery(bool enable);
+
+    /**
+     * @breif enables/disables getting the stray data.
+     * @param enable The new enable status of the query.
+     */
+    void setStrayQuery(bool enable);
+
 private:
+
+    static const int transform_query = 0001;
+    static const int stray_query = 1000;
+
     unsigned int number_of_targets_;
     serial::Serial m_port;
 
@@ -231,6 +247,9 @@ private:
      * @return 0 if answer was OKAY, >0 if answer was an error, <0 if answer couldn't be interpreted
      */
     static int checkAnswer(const std::string &answer);
+
+    bool query_transform_data_;
+    bool query_stray_markers_;
 };
 }
 #endif
