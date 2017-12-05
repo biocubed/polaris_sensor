@@ -67,11 +67,10 @@ class Polaris
 {
 
 public:
-    Polaris();
     /**
      * @brief Polaris Standard constructor.
      */
-    Polaris(const std::string port,const std::vector<std::string> roms);
+    explicit Polaris(const std::string port,const std::vector<std::string> roms);
     /**
      * @brief Standard destructor. Closes the com port if it is still open.
      */

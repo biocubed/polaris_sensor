@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     polaris.readStrayData(status_str, stray_targets);
 
     polaris.annoy(5);
-
+    polaris.flush();
     while (ros::ok())
     {
         /* Start TX */
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
 
 	ros::Time start = ros::Time::now();
 
-    polaris.readStrayData(status_str, stray_targets);
+    // polaris.readStrayData(status_str, stray_targets);
 
 	polaris.readDataTX(status,targets);
 
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
         ros::spinOnce();
         loop_rate.sleep();
         ++count;
-        polaris.flush();
+        
     }
 
     return 0;

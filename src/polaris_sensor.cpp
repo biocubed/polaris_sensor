@@ -66,10 +66,10 @@ int Polaris::PortHandle2int(const std::string& handle, int base)
     return out;
 }
 
-Polaris::Polaris()
-{
-}
-Polaris::Polaris(const std::string port,const std::vector<std::string> roms)
+
+Polaris::Polaris(const std::string port,const std::vector<std::string> roms):
+  query_transform_data_(true),
+  query_stray_markers_(true)
 {
     number_of_targets_ = 0;
     
@@ -122,7 +122,7 @@ std::string Polaris::readUntilCR(uint32_t timeout_ms)
 {
     m_port.setTimeout(serial::Timeout::max(), timeout_ms, 0, timeout_ms, 0);
     std::string result =  m_port.readline(65536,"\r");
-    removeChar(result,'\n');
+    // removeChar(result,'\n');
     return result;
 }
 
